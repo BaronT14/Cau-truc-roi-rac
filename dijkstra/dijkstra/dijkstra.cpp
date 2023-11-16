@@ -100,7 +100,7 @@ void dijkstra(int s, int n) {
 	}
 }
 
-void printPath(int s, int dest) {
+void printPathUngDung(int s, int dest) {
 	if (khoangCach[dest] == INF) {
 		cout << "Khong co duong nao tu " << maVungArr[s].ten << " den " << maVungArr[dest].ten << endl;
 		return;
@@ -122,6 +122,29 @@ void printPath(int s, int dest) {
 	}
 	cout << den;
 	cout << endl;
+}
+
+void printPath(int s, int dest) {
+	if (khoangCach[dest] == INF) {
+		cout << "Khong co duong nao tu " << s << " den " << dest << endl;
+		return;
+	}
+
+	cout << "Duong ngan nhat tu " << s << " den " << dest << ": ";
+	int current = dest;
+	int tmp[Nmax]; int i = 0;
+	int den = current;
+	while (pre[current].ma != INF) {
+		tmp[i] = pre[current].ma;
+		current = pre[current].ma;
+		i++;
+	}
+	while (i != 0)
+	{
+		cout << tmp[i - 1] << " -> ";
+		i--;
+	}
+	cout << den;
 }
 
 void inputMaVung() {
@@ -292,7 +315,7 @@ int main() {
 				break;
 			}
 			dijkstra(x, n);
-			printPath(x,y);
+			printPathUngDung(x,y);
 			cout << "Tong duong di tu " << di << " -> " << den << ": " << khoangCach[y] * 10 << "km" << endl;
 		}break;
 		case 2: {
@@ -328,23 +351,13 @@ int main() {
 		case 5: {
 			int j;
 			cout << "Nhap dinh bat dau: "; cin >> j;
-			nhapDoThiKhongTrongSo(n, m);
+			nhapDoThiTrongSo(a, n, m);
 			dijkstra(j, n);
 			for (int i = 0; i < n; i++)
 			{
-				if (j == i) {
-					cout << j;
-				}
-
-				int current = i;
-				cout << "Duong ngan nhat tu " << j << " den " << i << ": " << current;
-				while (current != j) {
-					cout << " <- " << pre[current].ma;
-					current = pre[current].ma;
-				}
-				cout << endl;
+				printPath(j, i);
+				cout << "| Khoang cach : " << khoangCach[i] << endl;
 			}
-
 		}break;
 		default:
 			break;
