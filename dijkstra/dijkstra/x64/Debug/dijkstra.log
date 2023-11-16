@@ -1,0 +1,4 @@
+﻿  dijkstra.cpp
+E:\workspace\CTRR\Dijkstra\dijkstra\dijkstra\dijkstra.cpp(10,17): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+E:\workspace\CTRR\Dijkstra\dijkstra\dijkstra\dijkstra.cpp(210,8): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  dijkstra.vcxproj -> E:\workspace\CTRR\Dijkstra\dijkstra\x64\Debug\dijkstra.exe
