@@ -41,7 +41,7 @@ void khoiTao(int a[][Nmax]) {
 	}
 	temp.clear();
 }
-//nhap bang danh sach canh co trong so // bieu dien bang ma tren ke
+//nhap ma tran ke co trong so // input : danh sach canh //Ung dung
 void nhapDoThiTrongSo(int a[][Nmax], int& n, int& m) {
 	ifstream f;
 	f.open("inputDijkstra.txt");
@@ -55,7 +55,7 @@ void nhapDoThiTrongSo(int a[][Nmax], int& n, int& m) {
 	f.close();
 }
 
-//nhap bang danh sach canh khong co trong so //bieu dien bang danh sach ke
+//nhap danh sach ke khong co trong so // input : danh sach canh
 void nhapDoThiKhongTrongSo(int& n, int& m) { 
 	ifstream f;
 	f.open("input.txt");
@@ -228,6 +228,48 @@ int ktrTinhLienThong(int n, int m) {
 	}
 	return cnt;
 }
+//Xuat danh sach ke cua 1 dinh
+void printAdjList(int i) {
+	cout << "Danh sach ke cua dinh " << i << ": ";
+	tham[i] = false;
+	for (int x : adj[i]) {
+		if (!tham[x]) {
+			cout << x << " ";
+			tham[x] = true;
+		}
+	}
+	cout << endl;
+}
+// Hàm xuất tất cả danh sách kề
+void printAdjacencyList(int n) {
+	cout << "Danh sach ke cua do thi:" << endl;
+	for (int i = 1; i <= n; ++i) {
+		cout << "Dinh " << i << ": ";
+		for (int x : adj[i]) {
+			cout << x << " ";
+		}
+		cout << endl;
+	}
+}
+//chuyen doi danh sach ke thanh ma tran ke
+void DSKtoMTK(int n){
+	for (int i = 1; i <= n; i++) {
+		for (int x : adj[i]) {
+			a[i][x] = 1;
+			a[x][i] = 1;
+		}
+	}
+}
+//xuat ma tran ke
+void printGraph(int n) {
+	DSKtoMTK(n);
+	for (int i = 1; i <= n; ++i) {
+		for (int j = 1; j <= n; ++j) {
+			cout << setw(5) << a[i][j];
+		}
+		cout << endl;
+	}
+}
 
 void chuanHoa(string& s) {
 	int n = s.length();
@@ -278,12 +320,15 @@ void chuanHoa(string& s) {
 
 void menu(int& c) {
 	cout << "----------------------------MENU----------------------------" << endl;
-	cout << "2 . Duyet BFS" << endl;
-	cout << "3 . Duyet DFS" << endl;
-	cout << "4 . Tinh lien thong cua do thi" << endl;
-	cout << "5 . Duong di ngan nhat (thuat toan dijkstra)" << endl;
+	cout << "1 . Duyet BFS" << endl;
+	cout << "2 . Duyet DFS" << endl;
+	cout << "3 . Tinh lien thong cua do thi" << endl;
+	cout << "4 . Duong di ngan nhat (thuat toan dijkstra)" << endl;
+	cout << "5 . Xuat ma tran ke " << endl;
+	cout << "6 . Tim dinh ke voi dinh i" << endl;
+	cout << "7 . Xuat danh sach ke" << endl;
 	cout << "--------------------------UNG DUNG--------------------------" << endl;
-	cout << "1 . Chon tuyen xe ngan nhat" << endl;
+	cout << "8 . Chon tuyen xe ngan nhat" << endl;
 	cout << "0 . Thoat" << endl;
 	cout << "------------------------------------------------------------" << endl;
 	cout << "Nhap lua chon: "; cin >> c;
@@ -299,11 +344,67 @@ int main() {
 		switch (c)
 		{
 		case 1: {
+			int j;
+			cout << "Duyet tu dinh: "; cin >> j;
+			nhapDoThiKhongTrongSo(n, m);
+			BFS(j);
+			for (int x : temp) {
+				cout << setw(5) << x;
+			}
+			cout << endl;
+		}break;
+		case 2: {
+			int j;
+			cout << "Duyet tu dinh: "; cin >> j;
+			nhapDoThiKhongTrongSo(n, m);
+			DFS(j);
+			for (int x : temp) {
+				cout << setw(5) << x;
+			}
+			cout << endl;
+		}break;
+		case 3: {
+			nhapDoThiKhongTrongSo(n, m);
+			int cnt = ktrTinhLienThong(n, m);
+			if (cnt == 1)
+				cout << "Do thi lien thong" << endl;
+			else {
+				cout << "Do thi khong lien thong" << endl;
+				cout << "Co " << cnt << " do thi con lien thong" << endl;
+			}
+		}break;
+		case 4: {
+			int j;
+			cout << "Nhap dinh bat dau: "; cin >> j;
+			nhapDoThiTrongSo(a, n, m);
+			dijkstra(j, n);
+			for (int i = 0; i < n; i++)
+			{
+				printPath(j, i);
+				cout << "| Khoang cach : " << khoangCach[i] << endl;
+			}
+		}break;
+		case 5: {//biểu diễn bằng ma trận kề
+			nhapDoThiKhongTrongSo(n, m);
+			printGraph(n);
+		}break;
+		case 6: {
+			// Hàm xuất danh sách kề của đỉnh i
+			int i;
+			cout << "Nhap dinh i: "; cin >> i;
+			nhapDoThiKhongTrongSo(n, m);
+			printAdjList(i);
+		}break;
+		case 7: {
+			nhapDoThiKhongTrongSo(n, m);
+			printAdjacencyList(n);
+		}break;
+		case 8: {
 			nhapDoThiTrongSo(a, n, m);
 			cout << "Nhap noi bat xe: ";
 			string di, den;
 			cin.ignore();
-			getline(cin,di);
+			getline(cin, di);
 			chuanHoa(di);
 			cout << "Nhap diem den: ";
 			getline(cin, den);
@@ -315,49 +416,8 @@ int main() {
 				break;
 			}
 			dijkstra(x, n);
-			printPathUngDung(x,y);
+			printPathUngDung(x, y);
 			cout << "Tong duong di tu " << di << " -> " << den << ": " << khoangCach[y] * 10 << "km" << endl;
-		}break;
-		case 2: {
-			int j;
-			cout << "Duyet tu dinh: "; cin >> j;
-			nhapDoThiKhongTrongSo(n, m);
-			BFS(j);
-			for (int x : temp) {
-				cout << setw(5) << x;
-			}
-			cout << endl;
-		}break;
-		case 3: {
-			int j;
-			cout << "Duyet tu dinh: "; cin >> j;
-			nhapDoThiKhongTrongSo(n, m);
-			DFS(j);
-			for (int x : temp) {
-				cout << setw(5) << x;
-			}
-			cout << endl;
-		}break;
-		case 4: {
-			nhapDoThiKhongTrongSo(n, m);
-			int cnt = ktrTinhLienThong(n, m);
-			if (cnt == 1)
-				cout << "Do thi lien thong" << endl;
-			else {
-				cout << "Do thi khong lien thong" << endl;
-				cout << "Co " << cnt << " do thi con lien thong" << endl;
-			}
-		}break;
-		case 5: {
-			int j;
-			cout << "Nhap dinh bat dau: "; cin >> j;
-			nhapDoThiTrongSo(a, n, m);
-			dijkstra(j, n);
-			for (int i = 0; i < n; i++)
-			{
-				printPath(j, i);
-				cout << "| Khoang cach : " << khoangCach[i] << endl;
-			}
 		}break;
 		default:
 			break;
@@ -365,17 +425,6 @@ int main() {
 		system("pause");
 		system("cls");
 	} while (c!=0);
-
-
-	//duyet do thi
-	/*for (int i = 0; i < n; i++)
-	{
-		for (int j = 0; j < n; j++)
-		{
-			cout << setw(5) << a[i][j];
-		}
-		cout << endl;
-	}*/
 
 	_getch();
 	return 0;
