@@ -21,6 +21,8 @@ struct ma_Vung
 	int ma;
 };
 int a[Nmax][Nmax];
+int dist[Nmax][Nmax];//khaong cach cua ham ployed
+int next1[Nmax][Nmax];//luu dinh ke
 int khoangCach[Nmax]; // khoang cach ngan nhat toi i
 bool tham[Nmax];
 ma_Vung pre[Nmax]; // lưu đỉnh trc đó trên đường đi ngắn nhất từ đỉnh nguồn tới mỗi đỉnh
@@ -56,21 +58,21 @@ void nhapDoThiTrongSo(int a[][Nmax], int& n, int& m) {
 }
 
 //nhap danh sach ke khong co trong so // input : danh sach canh
-void nhapDoThiKhongTrongSo(int& n, int& m) { 
+void nhapDoThiKhongTrongSo(int& n, int& m) {
 	ifstream f;
 	f.open("input.txt");
 	f >> n >> m;//so dinh, canh
 	for (int i = 0; i < m; i++)
 	{
 		int x, y;//canh dau cuoi
-		f >> x >> y ;
+		f >> x >> y;
 		adj[x].push_back(y);
 		adj[y].push_back(x);
 	}
 	f.close();
 }
 
- //thuat toan dijkstra  matranke
+//thuat toan dijkstra  matranke
 void dijkstra(int s, int n) {
 	khoangCach[s] = 0;
 	for (int i = 0; i < n; i++)
@@ -99,7 +101,19 @@ void dijkstra(int s, int n) {
 		}
 	}
 }
-
+//ployed-warshall
+void ployedWarshall(int V) {
+	for (int k = 0; k < V; k++) {
+		for (int i = 0; i < V; i++) {
+			for (int j = 0; j < V; j++) {
+				if (dist[i][j] > dist[i][k] + dist[k][j]) {
+					dist[i][j] = dist[i][k] + dist[k][j];
+					next1[i][j] = next1[i][k];
+				}
+			}
+		}
+	}
+}
 void printPathUngDung(int s, int dest) {
 	if (khoangCach[dest] == INF) {
 		cout << "Khong co duong nao tu " << maVungArr[s].ten << " den " << maVungArr[dest].ten << endl;
@@ -117,13 +131,31 @@ void printPathUngDung(int s, int dest) {
 	}
 	while (i != 0)
 	{
-		cout << tmp[i-1] << " -> ";
+		cout << tmp[i - 1] << " -> ";
 		i--;
 	}
 	cout << den;
 	cout << endl;
 }
-
+void printPathPloyed(int u, int v) {
+	if (next1[u][v] == -1) {
+		cout << "Khong co duong di giua " << u << " va " << v << "\n";
+		return;
+	}
+	vector<int> path = { u };
+	while (u != v) {
+		u = next1[u][v];
+		path.push_back(u);
+	}
+	cout << "Duong di ngan nhat tu " << path[0] << " den  " << v << ": ";
+	for (int i = 0; i < path.size(); i++) {
+		cout << path[i];
+		if (i != path.size() - 1) {
+			cout << " -> ";
+		}
+	}
+	cout << "\n";
+}
 void printPath(int s, int dest) {
 	if (khoangCach[dest] == INF) {
 		cout << "Khong co duong nao tu " << s << " den " << dest << endl;
@@ -163,7 +195,7 @@ void inputMaVung() {
 	f.close();
 }
 
-int maVung(string s, int n){
+int maVung(string s, int n) {
 	for (int i = 0; i < n; i++)
 	{
 		if (maVungArr[i].ten == s)
@@ -188,7 +220,7 @@ string tenVung(int s, int n) {
 
 //duyet thuat toan BFS  Danhsachke
 void BFS(int u) {
-	queue<int> q; 
+	queue<int> q;
 	q.push(u);
 	tham[u] = true;
 	while (!q.empty())
@@ -252,7 +284,7 @@ void printAdjacencyList(int n) {
 	}
 }
 //chuyen doi danh sach ke thanh ma tran ke
-void DSKtoMTK(int n){
+void DSKtoMTK(int n) {
 	for (int i = 1; i <= n; i++) {
 		for (int x : adj[i]) {
 			a[i][x] = 1;
@@ -270,7 +302,6 @@ void printGraph(int n) {
 		cout << endl;
 	}
 }
-
 void chuanHoa(string& s) {
 	int n = s.length();
 	for (int i = 0; i < n; i++) {
@@ -327,8 +358,9 @@ void menu(int& c) {
 	cout << "5 . Xuat ma tran ke " << endl;
 	cout << "6 . Tim dinh ke voi dinh i" << endl;
 	cout << "7 . Xuat danh sach ke" << endl;
+	cout << "8 . Duong di ngan nhat <Thuat toan Ployed-Warshall>" << endl;
 	cout << "--------------------------UNG DUNG--------------------------" << endl;
-	cout << "8 . Chon tuyen xe ngan nhat" << endl;
+	cout << "9 . Chon tuyen xe ngan nhat" << endl;
 	cout << "0 . Thoat" << endl;
 	cout << "------------------------------------------------------------" << endl;
 	cout << "Nhap lua chon: "; cin >> c;
@@ -401,6 +433,27 @@ int main() {
 		}break;
 		case 8: {
 			nhapDoThiTrongSo(a, n, m);
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < n; j++) {
+					if (a[i][j]) {
+						dist[i][j] = a[i][j];
+						next1[i][j] = j;
+					}
+					else {
+						dist[i][j] = INF;
+						next1[i][j] = -1;
+					}
+				}
+			}
+			ployedWarshall(n);
+			int start, end;
+			cout << "Nhap 2 diem can tim duong di ngan nhat: ";
+			cin >> start >> end;
+			printPathPloyed(start, end);
+
+		}break;
+		case 9: {
+			nhapDoThiTrongSo(a, n, m);
 			cout << "Nhap noi bat xe: ";
 			string di, den;
 			cin.ignore();
@@ -424,7 +477,7 @@ int main() {
 		}
 		system("pause");
 		system("cls");
-	} while (c!=0);
+	} while (c != 0);
 
 	_getch();
 	return 0;
